@@ -1,0 +1,39 @@
+# Settings for building the index and running the app.
+# Paths are relative to the repo root.
+
+data:
+  raw_dir: data/raw
+  processed_dir: data/processed
+  business_file: yelp_academic_dataset_business.json
+  review_file: yelp_academic_dataset_review.json
+
+# Which slice of Yelp to index. Start small (one state), grow later.
+filter:
+  states: [PA]              # empty list [] means every state in the dataset
+  open_only: true           # drop businesses marked closed
+  min_review_count: 10      # skip restaurants with very few reviews
+  reviews_per_restaurant: 20  # most useful/recent reviews kept per restaurant
+
+index:
+  dir: index
+  collection: reviews
+  embedding_model: all-MiniLM-L6-v2
+  max_words_per_chunk: 200
+  batch_size: 256
+
+search:
+  candidate_chunks: 200       # review snippets pulled from the vector store per query
+  top_restaurants: 10         # restaurants shown and sent to the LLM
+  snippets_per_restaurant: 3
+
+ranking:
+  weight_similarity: 0.6
+  weight_stars: 0.25
+  weight_popularity: 0.15
+
+llm:
+  provider: claude            # claude | ollama | none
+  claude_model: claude-haiku-4-5
+  ollama_model: llama3.1
+  ollama_url: http://localhost:11434
+  max_tokens: 1024
