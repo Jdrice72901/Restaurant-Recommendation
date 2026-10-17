@@ -1,5 +1,5 @@
 # Restaurant-Recommendation
-An LLM powered restaurant recommendation system, completed as a group project. 
+LLM powered restaurant recommendation system, completed as a group project. 
 
 Link to the data set used
 https://business.yelp.com/data/resources/open-dataset/
