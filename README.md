@@ -64,6 +64,7 @@ llm:
   provider: ollama
   ollama_model: llama3.1
 ```
+or whatever ollama model you have installed
 
 ## Tests
 
