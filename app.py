@@ -8,7 +8,7 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 
-from recommender.answer import generate_answer  # noqa: E402
+from recommender.answer import MissingAPIKeyError, generate_answer  # noqa: E402
 from recommender.config import load_config  # noqa: E402
 from recommender.index import SentenceTransformerEmbedder, open_collection  # noqa: E402
 from recommender.rank import rank_restaurants  # noqa: E402
@@ -73,7 +73,10 @@ if st.button("Find restaurants", type="primary") and query.strip():
 
     if cfg["llm"]["provider"] != "none":
         st.subheader("Recommendation")
-        st.write_stream(generate_answer(query, results, cfg["llm"]))
+        try:
+            st.write_stream(generate_answer(query, results, cfg["llm"]))
+        except MissingAPIKeyError as e:
+            st.error(str(e))
 
     if results:
         st.subheader(f"Top {len(results)} matches")

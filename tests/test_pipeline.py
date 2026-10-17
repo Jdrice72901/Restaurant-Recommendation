@@ -14,7 +14,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from recommender.answer import build_prompt, generate_answer  # noqa: E402
+from recommender.answer import MissingAPIKeyError, build_prompt, generate_answer  # noqa: E402
 from recommender.config import load_config  # noqa: E402
 from recommender.index import build_index, chunk_text, open_collection  # noqa: E402
 from recommender.prep import build_tables  # noqa: E402
@@ -137,3 +137,11 @@ def test_answer_prompt_and_no_llm():
     assert "Thai Orchid" in prompt and "$$" in prompt and "great curry" in prompt
     assert list(generate_answer("thai", r, {"provider": "none"})) == []
     assert "No restaurants" in "".join(generate_answer("thai", [], {"provider": "claude"}))
+
+
+def test_claude_without_api_key_raises(monkeypatch):
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    r = [{"name": "Thai Orchid", "city": "Philadelphia", "state": "PA", "stars": 4.5, "review_count": 120,
+          "price": 2, "categories": "Thai", "snippets": ["great curry"]}]
+    with pytest.raises(MissingAPIKeyError, match="No Claude API key provided"):
+        list(generate_answer("thai", r, {"provider": "claude"}))

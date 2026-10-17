@@ -6,7 +6,12 @@ claude (default, needs ANTHROPIC_API_KEY), ollama (local), or none.
 """
 
 import json
+import os
 from collections.abc import Iterator
+
+
+class MissingAPIKeyError(RuntimeError):
+    pass
 
 SYSTEM_PROMPT = """You are a restaurant recommendation assistant built on Yelp reviews.
 
@@ -49,6 +54,12 @@ def generate_answer(query: str, restaurants: list[dict], llm_cfg: dict) -> Itera
 
 
 def _claude(prompt: str, llm_cfg: dict) -> Iterator[str]:
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        raise MissingAPIKeyError(
+            "No Claude API key provided. Set the ANTHROPIC_API_KEY environment variable, "
+            "or set llm.provider to none in config.yaml."
+        )
+
     import anthropic
 
     client = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from the environment
