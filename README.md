@@ -38,6 +38,9 @@ data/raw/yelp_academic_dataset_business.json
 data/raw/yelp_academic_dataset_review.json
 ```
 
+No download yet? `python scripts/make_sample_data.py` writes a small made-up dataset in the same format
+(about 50 businesses and 900 reviews) so you can try the whole pipeline.
+
 Build the tables and the search index (one time; rerun after changing `filter` settings):
 
 ```bash
