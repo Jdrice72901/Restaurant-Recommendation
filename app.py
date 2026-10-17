@@ -1,5 +1,6 @@
 """Streamlit front end. Run with:  streamlit run app.py"""
 
+import os
 import sys
 from pathlib import Path
 
@@ -15,6 +16,14 @@ from recommender.rank import rank_restaurants  # noqa: E402
 from recommender.retrieve import SearchFilters, search  # noqa: E402
 
 st.set_page_config(page_title="Restaurant Finder", page_icon="🍽️", layout="wide")
+
+# Each person can keep their own key in .streamlit/secrets.toml (gitignored).
+# An ANTHROPIC_API_KEY already set in the environment takes precedence.
+if not os.environ.get("ANTHROPIC_API_KEY"):
+    try:
+        os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"]
+    except (KeyError, FileNotFoundError, st.errors.StreamlitSecretNotFoundError):
+        pass
 
 
 @st.cache_resource

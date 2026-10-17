@@ -55,6 +55,10 @@ export ANTHROPIC_API_KEY=sk-ant-...     # Windows PowerShell: $env:ANTHROPIC_API
 streamlit run app.py
 ```
 
+Or, so you don't have to set it every time, copy `.streamlit/secrets.toml.example` to
+`.streamlit/secrets.toml` and paste your key there. That file is gitignored, so each person keeps their
+own key and it never gets pushed.
+
 ## Using Ollama instead of Claude
 
 Install a model (`ollama pull llama3.1`), then in `config.yaml` set:
