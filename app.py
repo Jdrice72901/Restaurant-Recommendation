@@ -49,8 +49,15 @@ if restaurants is None:
 
 with st.sidebar:
     st.header("Filters")
-    states = sorted(restaurants["state"].dropna().unique())
-    state = st.selectbox("State", states)
+    # Every state in the index, largest first, labeled with its biggest city so the metro area is clear.
+    by_state = restaurants.groupby("state")["city"].agg(["size", lambda c: c.mode().iat[0]])
+    by_state.columns = ["count", "top_city"]
+    by_state = by_state.sort_values("count", ascending=False)
+    state = st.selectbox(
+        "State",
+        by_state.index.tolist(),
+        format_func=lambda s: f"{s} · {by_state.at[s, 'top_city']} area ({by_state.at[s, 'count']:,} restaurants)",
+    )
     cities = sorted(restaurants.loc[restaurants["state"] == state, "city"].dropna().unique())
     city = st.selectbox("City", ["Any"] + cities)
     cuisine = st.text_input("Cuisine (optional)", placeholder="e.g. Thai, Pizza, Vegan")

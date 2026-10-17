@@ -9,7 +9,7 @@ data:
 
 # Which slice of Yelp to index. Start small (one state), grow later.
 filter:
-  states: [PA]              # empty list [] means every state in the dataset
+  states: [PA, FL, TN, IN, MO, LA, NJ, AZ, AB, NV, ID, CA, DE, IL]  # the 11 Yelp metro areas; [] means every state
   open_only: true           # drop businesses marked closed
   min_review_count: 10      # skip restaurants with very few reviews
   reviews_per_restaurant: 20  # most useful/recent reviews kept per restaurant
