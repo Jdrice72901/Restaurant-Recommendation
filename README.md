@@ -6,6 +6,23 @@ https://business.yelp.com/data/resources/open-dataset/
 This is a large file, compressed TAR file (4.35 GB). Uncompressed it contains 1 PDF and 5 JSON files (8.65 GB)
 Takes a while to download and uncompress.
 
+## How it works
+
+1. **Prep** (`src/recommender/prep.py`): keeps open restaurants from `business.json` for the states in
+   `config.yaml`, then keeps the top reviews for each one from `review.json`, joined on `business_id`.
+   Output: `data/processed/restaurants.parquet` and `reviews.parquet`.
+2. **Index** (`src/recommender/index.py`): splits reviews into snippets, embeds them with
+   sentence-transformers (`all-MiniLM-L6-v2`), and saves them in a local Chroma index under `index/`.
+   Each snippet carries its restaurant's `business_id`, state, city, stars and price.
+3. **Search** (`src/recommender/retrieve.py`): filters by state, city, price, stars and cuisine, then finds
+   the review snippets closest in meaning to the user's request.
+4. **Rank** (`src/recommender/rank.py`): groups snippets by restaurant and scores each one on match
+   strength, star rating and review volume (weights in `config.yaml`).
+5. **Answer** (`src/recommender/answer.py`): sends only the top restaurants and their snippets to an LLM,
+   which writes the recommendation. Claude Haiku 4.5 by default; set `llm.provider` to `ollama` to use a
+   local model, or `none` to skip it.
+6. **App** (`app.py`): the Streamlit page.
+
 ## Getting started
 
 Commands below are for Windows PowerShell. On Mac/Linux, activate with `source .venv/bin/activate` and use
@@ -101,37 +118,6 @@ llm:
 It opens at http://localhost:8501. Pick a state in the sidebar and describe what you're in the mood for.
 The first page load takes about 15 seconds while the embedding model loads.
 
-## Troubleshooting
-
-- **`No module named ...` or numpy errors when using conda:** your terminal may be using conda's Python
-  instead of the project's. Running `.venv\Scripts\python.exe` directly (as in step 6) always uses the
-  right one.
-- **`pip install` times out:** rerun the same command. Packages that already downloaded are reused.
-- **"No index found" in the app:** run step 4 first.
-- **"No Claude API key provided":** add your key (step 5), or set `provider` to `none` or `ollama`.
-- **Changed `config.yaml` or `secrets.toml` and nothing happened:** the app reads them at startup, so stop
-  it (Ctrl+C) and run it again.
-
-## How it works
-
-This is a retrieval-augmented generation (RAG) pipeline:
-
-1. **Prep** (`src/recommender/prep.py`): keeps open restaurants from `business.json` for the states in
-   `config.yaml`, then keeps the top reviews for each one from `review.json`, joined on `business_id`.
-   Output: `data/processed/restaurants.parquet` and `reviews.parquet`.
-2. **Index** (`src/recommender/index.py`): splits reviews into snippets, embeds them with
-   sentence-transformers (`all-MiniLM-L6-v2`), and saves them in a local Chroma index under `index/`.
-   Each snippet carries its restaurant's `business_id`, state, city, stars and price.
-3. **Search** (`src/recommender/retrieve.py`): filters by state, city, price, stars and cuisine, then finds
-   the review snippets closest in meaning to the user's request.
-4. **Rank** (`src/recommender/rank.py`): groups snippets by restaurant and scores each one on match
-   strength, star rating and review volume (weights in `config.yaml`).
-5. **Answer** (`src/recommender/answer.py`): sends only the top restaurants and their snippets to the LLM
-   chosen in step 5, which writes the recommendation.
-6. **App** (`app.py`): the Streamlit page.
-
-Steps 1 and 2 run in `scripts/build_index.py`; steps 3 to 5 run on every search.
-
 ## Configuration
 
 Everything tunable lives in `config.yaml`:
@@ -150,3 +136,14 @@ Everything tunable lives in `config.yaml`:
 ```
 
 The tests build a tiny fake dataset, so they run without the Yelp download.
+
+## Troubleshooting
+
+- **`No module named ...` or numpy errors when using conda:** your terminal may be using conda's Python
+  instead of the project's. Running `.venv\Scripts\python.exe` directly (as in step 6) always uses the
+  right one.
+- **`pip install` times out:** rerun the same command. Packages that already downloaded are reused.
+- **"No index found" in the app:** run step 4 first.
+- **"No Claude API key provided":** add your key (step 5), or set `provider` to `none` or `ollama`.
+- **Changed `config.yaml` or `secrets.toml` and nothing happened:** the app reads them at startup, so stop
+  it (Ctrl+C) and run it again.
