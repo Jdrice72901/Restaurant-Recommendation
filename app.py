@@ -58,8 +58,14 @@ with st.sidebar:
         by_state.index.tolist(),
         format_func=lambda s: f"{s} · {by_state.at[s, 'top_city']} area ({by_state.at[s, 'count']:,} restaurants)",
     )
-    cities = sorted(restaurants.loc[restaurants["state"] == state, "city"].dropna().unique())
-    city = st.selectbox("City", ["Any"] + cities)
+    # Cities in the chosen state, most restaurants first.
+    city_counts = restaurants.loc[restaurants["state"] == state, "city"].value_counts()
+    city = st.selectbox(
+        "City",
+        ["Any"] + city_counts.index.tolist(),
+        format_func=lambda c: f"Any ({city_counts.sum():,} restaurants)" if c == "Any"
+        else f"{c} ({city_counts[c]:,} restaurants)",
+    )
     cuisine = st.text_input("Cuisine (optional)", placeholder="e.g. Thai, Pizza, Vegan")
     max_price = st.select_slider("Max price", options=[1, 2, 3, 4], value=4, format_func=lambda p: "$" * p)
     min_stars = st.slider("Minimum stars", 1.0, 5.0, 3.5, 0.5)
