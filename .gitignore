@@ -220,5 +220,13 @@ __marimo__/
 .streamlit/secrets.toml
 
 # Project data and build outputs
-data/
-index/
+data/**/*
+index/*
+
+!/data/raw/
+!/data/processed/
+!/data/raw/.gitkeep
+!/data/processed/.gitkeep
+!/index/.gitkeep
+
+local_docs/
