@@ -1,5 +1,4 @@
 import argparse
-import gzip
 import json
 import shutil
 import sys
@@ -238,9 +237,7 @@ if __name__ == '__main__':
         ValueError,
         KeyError,
         EOFError,
-        requests.RequestException,
         zipfile.BadZipFile,
         tarfile.TarError,
-        gzip.BadGzipFile,
     ) as exc:
         raise SystemExit(f"Ingestion failed: {exc}") from exc

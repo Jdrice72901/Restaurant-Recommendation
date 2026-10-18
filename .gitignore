@@ -230,3 +230,5 @@ index/*
 !/index/.gitkeep
 
 local_docs/
+
+pyproject.toml

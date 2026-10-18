@@ -1,0 +1,20 @@
+# Independent baseline; never overwrites the POC outputs
+data:
+  raw_dir: data/raw
+  analytical_dir: data/processed/analytical
+  business_file: yelp_academic_dataset_business.json
+  review_file: yelp_academic_dataset_review.json
+serving:
+  states: []
+  open_only: true
+  min_review_count: 0
+  reviews_per_restaurant: null  # optional evidence cap, never a training cap
+  before: null                # exclusive ISO timestamp; historical evidence builds
+index:
+  dir: index/baseline
+  embedding_model: sentence-transformers/all-MiniLM-L6-v2
+  revision: null
+  max_tokens: 220             # includes special tokens; validated against model
+  overlap_tokens: 32
+  batch_size: 128
+  seed: 42

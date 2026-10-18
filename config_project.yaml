@@ -1,0 +1,33 @@
+# Final data/retrieval decisions. Consumed by 01_data_readiness.py.
+# The older config_index.yaml still belongs to the dense-only baseline builder.
+scope:
+  city_normalized: philadelphia
+  state_normalized: PA
+  category: Restaurants
+  serving_snapshot_open_only: true
+  exclude_flagged_coordinates: true
+evaluation:
+  train_end: '2020-01-01'
+  validation_end: '2021-01-01'
+  positive_stars: 4
+  min_history: 5
+  pair_rating: latest_before_cutoff
+evidence:
+  reviews_per_restaurant: null
+  preserve_negative_reviews: true
+  max_tokens: 220
+  overlap_tokens: 32
+retrieval:
+  embedding_model: google/embeddinggemma-300m
+  revision: 57c266a740f537b4dc058e1b0cda161fd15afa75
+  document_prompt: 'title: none | text: '
+  query_prompt: 'task: search result | query: '
+  normalize_embeddings: true
+  bm25_k1: 1.2
+  bm25_b: 0.75
+  fusion: reciprocal_rank
+  fusion_k: 60
+  per_retriever_restaurants: 50
+  candidate_restaurants: 30
+  reranker: null
+  seed: 42
