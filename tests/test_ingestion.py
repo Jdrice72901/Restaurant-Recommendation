@@ -138,7 +138,7 @@ def test_default_archive_uses_raw_directory_only(tmp_path, monkeypatch, already_
 
 def test_validation_checks_records_beyond_first_line(tmp_path):
     source = tmp_path / 'reviews.json'
-    source.write_text("{'review_id': 'r1'}\nnot json\n", encoding='utf-8')
+    source.write_text(json.dumps({'review_id': 'r1'}) + '\nnot json\n', encoding='utf-8')
     with pytest.raises(ValueError, match='line 2'):
         ingestion.validate_jsonl(source, {'review_id'})
 
