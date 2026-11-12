@@ -4,7 +4,7 @@ device: cuda
 embedding_batch_size: 32
 top_restaurants: 10
 llm:
-  provider: none
-  ollama_model: llama3.1
+  provider: ollama
+  ollama_model: qwen3:4b-instruct
   ollama_url: http://localhost:11434
   max_tokens: 1024
