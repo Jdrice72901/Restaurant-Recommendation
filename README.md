@@ -1,12 +1,76 @@
-# Restaurant-Recommendation
+# Restaurant Recommendation
 
-LLM powered restaurant recommendation system, completed as a group project.
+Philadelphia restaurant search and recommendations, developed as a DSBA 6188 Text Mining & Information Retrieval group project. The current system combines lexical and semantic retrieval.
 
 Link to the data set used
 https://business.yelp.com/data/resources/open-dataset/
 The 4.35 GB ZIP contains a documentation PDF and a gzip compressed TAR. The TAR contains another agreement PDF and five JSONL files (9.29 GB extracted in total). Takes a while to download and uncompress.
 
-## How it works
+## Current highlights
+
+- **Full serving index:** 3,527 restaurants, 511,311 reviews, and 636,498 source passages
+- **Hybrid retrieval:** BM25 + `google/embeddinggemma-300m`, combined with equal weight reciprocal rank fusion, no reranker
+- **Evidence first results:** unique restaurants, attributable review excerpts, and strict price, delivery, takeout, and outdoor seating filters
+- **Streamlit app:** search, restaurant cards, and map, with optional local Ollama recommendation text
+- **Completed development evaluation:** 12 queries, 360 graded query/restaurant pairs, and 120 top 10 results
+
+Serving evidence includes all available review dates for Philadelphia restaurants marked open in the dataset snapshot. This historical snapshot cannot be used to establish current operating status, prices, or dietary safety since it is point-in-time.
+
+## Retrieval metrics and plots
+
+Results from the frozen serving development evaluation:
+
+| Metric | Macro Average | Queries Included |
+| --- | ---: | --- |
+| Precision@10 | **0.6250** | All 12 |
+| Restricted-pool NDCG@10 | **0.6690** | 11 with a supported match in the graded pool |
+| Restricted-pool Recall@10 | **0.3379** | 11 with a supported match in the graded pool |
+
+A supported match has relevance grade 2 or 3 on the 0-3 rubric. Precision represents **75 supported results out of 120 top 10 slots**. NDCG uses exponential gains and an ideal ranking drawn from each query's 30 graded candidates. The full formula is as follows:
+
+$$
+\text{NDCG@10} = \frac{\text{DCG@10}}{\text{IDCG@10}} \\[10pt]
+\text{DCG@10} = \sum_{i=1}^{10} \frac{2^{g_i}−1}{\log_2(i+1)} \\[10pt]
+\text{IDCG@10} = \sum_{i=1}^{10} \frac{2^{g^*_i}−1}{\log_2(i+1)}
+$$
+
+Recall uses supported candidates in that same pool as its denominator. Queries receive equal weight.
+
+The impossible Moon location query scores zero for precision and is excluded from NDCG/recall. The no live music query has supported candidates deeper in its pool but none in its top ten, so its zero scores remain included. All 40/40 top 10 results subject to active structured filters satisfied those metadata requirements.
+
+### Precision@10
+
+![Precision at 10 by development query](data/processed/evaluation/serving_relevance_v1/precision_by_query.png)
+
+### NDCG@10
+
+![Restricted-pool NDCG at 10 by development query](data/processed/evaluation/serving_relevance_v1/ndcg_by_query.png)
+
+### Pooled Recall@10
+
+![Restricted-pool recall at 10 by development query](data/processed/evaluation/serving_relevance_v1/recall_by_query.png)
+
+**Interpretation:** these are development results using human labeled results. They are not outside ground source of truth or measured user impact. The candidate pool comes from one retrieval system, so NDCG and recall describe that restricted pool rather than full catalog performance. N/A indicates no supported match in the judged pool. Dietary combinations and negated requests remain priorities for error analysis.
+
+[The executed evaluation notebook](notebooks/serving_evaluation.ipynb) runs through the process. Initial pilot and serving scores use different corpora and judging pools and should not be treated as a measured improvement comparison. Evaluation data and indexes remain local.
+
+## Serving index app
+
+Run the second app against the completed Philadelphia serving index:
+
+```powershell
+.\.venv\Scripts\python.exe -m streamlit run app_hybrid.py
+```
+
+`app_hybrid.py` keeps the original search/map/card layout and uses the completed `index/hybrid/serving/active.json` build through `HybridIndex`. Retrieval settings come from `config_project.yaml`. Device, result count, and optional local generation come from `config_app.yaml`. CUDA is the configured default since CPU takes very long, set `device: cpu` for a machine without CUDA. The app does not rebuild indexes or load evaluation data.
+
+Price, delivery, takeout, and outdoor seating filter both retrievers before fusion. Required filters exclude unknown metadata. Results retain hybrid RRF order and display attributable source passages. All restaurant metadata and reviews are historical.
+
+Recommendation text defaults to off. Select Ollama in the sidebar to use a running local Ollama server and the model configured in `config_app.yaml`, the app does not download or start that model. No paid provider is enabled. Generation reuses the existing streaming adapter with source IDs and grounding instructions.
+
+The original `app.py` remains available with its original config and index. The POC workflow below describes that original app.
+
+## Original POC workflow
 
 1. **Prep** (`src/recommender/prep.py`): keeps open restaurants from `business.json` for the states in
    `config.yaml`, then keeps the top reviews for each one from `review.json`, joined on `business_id`.
@@ -23,7 +87,7 @@ The 4.35 GB ZIP contains a documentation PDF and a gzip compressed TAR. The TAR 
    local model, or `none` to skip it.
 6. **App** (`app.py`): the Streamlit page.
 
-## Getting started
+## Original POC setup and historical build workflows
 
 Commands below are for Windows PowerShell. On Mac/Linux, activate with `source .venv/bin/activate` and use
 forward slashes in paths.
@@ -101,11 +165,11 @@ The trial is a build/reload smoke test. Both full builds encode all eligible rev
 
 `--embedding-batch-size` independently controls model inference batches (default 32).
 
-If you have a modern NVidia GPU, the CUDA workflow is many times faster.
+CUDA accelerates embedding inference, chunking, index writes, and BM25 construction still use host resources. Actual build time depends on hardware and batch settings.
 
 Artifacts live under `index/hybrid/<evaluation|serving>/builds/<build-id>/`: Chroma, BM25, source passages, restaurant metadata and a completed manifest. `trial.json` and `active.json` are separate pointers; evaluation and serving cannot overwrite each other. Failed builds do not replace a completed pointer. A failed build currently restarts in a new build directory; automatic resume is not implemented.
 
-`recommender.index_hybrid.HybridIndex` reloads these artifacts and returns fused unique restaurants with contributing source passages. Price/delivery/takeout/outdoor filters apply to both retrievers, with unknown attributes excluded from strict requirements. The existing Streamlit app still is unchanged in function and index usage.
+`recommender.index_hybrid.HybridIndex` reloads these artifacts and returns fused unique restaurants with contributing source passages. Price/delivery/takeout/outdoor filters apply to both retrievers, with unknown attributes excluded from strict requirements. `app_hybrid.py` uses this serving workflow, `app.py` retains the original POC workflow.
 
 ### Earlier dense only baseline workflow
 
@@ -194,9 +258,9 @@ llm:
 It opens at http://localhost:8501. Pick a state in the sidebar and describe what you're in the mood for.
 The first page load takes about 15 seconds while the embedding model loads.
 
-## Configuration
+## Original POC configuration
 
-Everything tunable lives in `config.yaml`:
+The current hybrid app uses `config_project.yaml` and `config_app.yaml`, as described above. For the original POC, settings live in `config.yaml`:
 
 - `filter`: which states to index (`states: [PA]`; `[]` means all), open restaurants only, minimum review
   count, and reviews kept per restaurant. Rebuild the index after changing these.

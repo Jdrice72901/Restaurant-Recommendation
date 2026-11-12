@@ -1,0 +1,10 @@
+# UI and optional local generation for app_hybrid.py
+# Retrieval settings remain authoritative in config_project.yaml
+device: cuda
+embedding_batch_size: 32
+top_restaurants: 10
+llm:
+  provider: none
+  ollama_model: llama3.1
+  ollama_url: http://localhost:11434
+  max_tokens: 1024

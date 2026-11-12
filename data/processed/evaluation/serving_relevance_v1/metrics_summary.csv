@@ -1,0 +1,4 @@
+metric,macro_mean,queries_scored,queries_total
+precision_at_10,0.625,12,12
+ndcg_at_10,0.6689561366559335,11,12
+pooled_recall_at_10,0.33790778149109746,11,12

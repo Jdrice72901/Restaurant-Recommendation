@@ -1,0 +1,13 @@
+query_id,query,intent,judged_pool,supported_pool,supported_top10,precision_at_10,ndcg_at_10,pooled_recall_at_10,constraint_fail_top10,constraint_unknown_top10,mixed_evidence_top10
+app_01,spicy Thai curry,cuisine,30,22,7,0.7,0.6259432641901173,0.3181818181818182,0,3,1
+app_02,wood fired pizza,cuisine,30,24,9,0.9,0.907608339569819,0.375,0,1,1
+app_03,quiet place for a date night,atmosphere,30,18,6,0.6,0.6153086704025966,0.3333333333333333,0,4,4
+app_04,vegan dinner with several options,dietary,30,21,6,0.6,0.4790111488563588,0.2857142857142857,0,4,0
+app_05,gluten free pizza options,dietary,30,22,9,0.9,0.7583815500527348,0.4090909090909091,0,1,2
+app_06,quick affordable lunch,service,30,23,9,0.9,0.8913031161897267,0.391304347826087,0,1,0
+app_07,takeout dinner delivered,service,30,25,9,0.9,0.8822211740336533,0.36,0,1,1
+app_08,inexpensive lunch with outdoor seating,conjunction,30,28,10,1.0,0.9513467899190737,0.35714285714285715,0,0,0
+app_09,spicy vegetarian curry for takeout,conjunction,30,7,4,0.4,0.5383896796550015,0.5714285714285714,0,6,0
+app_10,dinner without live music,negation,30,3,0,0.0,0.0,0.0,10,0,0
+app_11,comida vegetariana,multilingual,30,19,6,0.6,0.7090037703461861,0.3157894736842105,0,4,0
+app_12,a restaurant on the moon,impossible_location,30,0,0,0.0,,,10,0,0

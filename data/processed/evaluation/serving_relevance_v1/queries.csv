@@ -1,0 +1,13 @@
+query_id,query,intent,max_price,delivery,takeout,outdoor
+app_01,spicy Thai curry,cuisine,,False,False,False
+app_02,wood fired pizza,cuisine,,False,False,False
+app_03,quiet place for a date night,atmosphere,,False,False,False
+app_04,vegan dinner with several options,dietary,,False,False,False
+app_05,gluten free pizza options,dietary,,False,False,False
+app_06,quick affordable lunch,service,2,False,False,False
+app_07,takeout dinner delivered,service,,True,True,False
+app_08,inexpensive lunch with outdoor seating,conjunction,2,False,False,True
+app_09,spicy vegetarian curry for takeout,conjunction,,False,True,False
+app_10,dinner without live music,negation,,False,False,False
+app_11,comida vegetariana,multilingual,,False,False,False
+app_12,a restaurant on the moon,impossible_location,,False,False,False

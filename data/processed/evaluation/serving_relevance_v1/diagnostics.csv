@@ -1,0 +1,10 @@
+,value
+judged_pairs,360.0
+pool_label_coverage,1.0
+primary_pairs,120.0
+primary_label_coverage,1.0
+structured_filter_pairs_checked,40.0
+structured_filter_pass_rate,1.0
+semantic_constraint_fail_rate_top10,0.16666666666666666
+semantic_constraint_unknown_rate_top10,0.20833333333333334
+mixed_evidence_rate_top10,0.075

@@ -225,6 +225,9 @@ index/*
 
 !/data/raw/
 !/data/processed/
+!/data/processed/evaluation/
+!/data/processed/evaluation/serving_relevance_v1/
+!/data/processed/evaluation/serving_relevance_v1/**
 !/data/raw/.gitkeep
 !/data/processed/.gitkeep
 !/index/.gitkeep
